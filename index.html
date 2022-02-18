@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Calculate BMI</h1>
+      </header>
+      <form id="myForm" class="my-form">
+        <section class="form-control">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            name="username"
+            id="username"
+            placeholder="Enter your name"
+            required
+          />
+        </section>
+        <section class="form-control">
+          <label for="passwd">Password</label>
+          <input
+            type="password"
+            name="passwd"
+            id="passwd"
+            placeholder="Enter a password"
+            required
+          />
+        </section>
+        <section class="form-control">
+          <label for="height">Height</label>
+          <input
+            type="float"
+            id="height"
+            placeholder="Enter in meters"
+            required
+          />
+        </section>
+        <section class="form-control">
+          <label for="weight">Weight</label>
+          <input type="float" id="weight" placeholder="Enter in Kgs" required />
+        </section>
+        <section>
+
+        <section>
+          <button type="submit" class="submit-btn">Submit</button>
+        </section>
+      </form>
+    </main>
+    <section>
+      <h4 id="user-details"></h4>
+    </section>
+    <script>
+      document.getElementById("myForm").onsubmit = (e) => {
+        e.preventDefault();
+        const url = "http://localhost:5000/sent-data";
+
+        var data = new URLSearchParams();
+        console.log(e.target);
+        for (const pair of new FormData(e.target)) {
+          console.log(pair);
+          data.append(pair[0], pair[1]);
+        }
+
+        fetch(url, {
+          method: "post",
+          body: data,
+        })
+          .then((res) => res.json())
+          .then((res2) => {
+            const userDetails = document.getElementById("user-details");
+            userDetails.innerHTML = `Hey ${res2.username}.`;
+            //for BMI
+            let height = document.getElementById("height").value;
+            let weight = document.getElementById("weight").value;
+            fetch(
+              `https://body-mass-index-bmi-calculator.p.rapidapi.com/metric?weight=${weight}&height=${height}`,
+              {
+                method: "GET",
+                headers: {
+                  "x-rapidapi-host":
+                    "body-mass-index-bmi-calculator.p.rapidapi.com",
+                  "x-rapidapi-key":
+                    "87cd0412d2msh09018f4c8886585p19026cjsn805829dfedc5",
+                },
+              }
+            )
+              .then((response) => response.json())
+
+              .then((response) => {
+                let bmi = Math.floor(response.bmi);
+                userDetails.innerHTML += `Your BMI is: ${bmi}.<br/> Not sure what BMI number means? 
+            Check this out:<a href="https://www.thebodypro.com/article/bmi-chart" target=_blank>Learn more about BMI</a>`;
+              })
+              .catch((err) => {
+                console.error(err);
+              });
+
+            console.log(res2);
+          });
+      };
+    </script>
+  </body>
+</html>
